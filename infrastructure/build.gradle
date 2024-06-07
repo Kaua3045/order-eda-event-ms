@@ -1,0 +1,43 @@
+plugins {
+    id 'java-library'
+    id 'java-conventions'
+}
+
+group = 'com.kaua.template.infrastructure'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation(project(":domain"))
+    implementation(project(":application"))
+}
+
+testCodeCoverageReport {
+    dependsOn(test)
+
+    afterEvaluate {
+        classDirectories.setFrom(
+                files(classDirectories.files.collect {
+                    fileTree(dir: it, exclude: [
+                            'com/kaua/template/infrastructure/configurations/*',
+                            'com/kaua/template/infrastructure/Main.class'
+                    ])
+                })
+        )
+    }
+}
+
+jacocoTestCoverageVerification {
+    afterEvaluate {
+        classDirectories.setFrom(
+                files(classDirectories.files.collect {
+                    fileTree(dir: it, exclude: [
+                            'com/kaua/template/infrastructure/configurations/*',
+                            'com/kaua/template/infrastructure/Main.class'
+                    ])
+                })
+        )
+    }
+}
