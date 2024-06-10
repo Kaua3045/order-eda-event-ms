@@ -63,8 +63,6 @@ u
 Edomain/src/main/java/com/kaua/template/domain/events/DomainEvent.java,c/6/c667aa12439c5e61ee2247e6729b82804ca5e8b9
 ~
 Ndomain/src/main/java/com/kaua/template/domain/events/DomainEventPublisher.java,0/0/00430d942eb96c37afcb9d747706d6fd75c935b4
-h
-8domain/src/main/java/com/kaua/template/domain/Teste.java,2/0/20b9f5bb237cafd862800ea619223eaa58dd1303
 
 Odomain/src/main/java/com/kaua/template/domain/exceptions/NotFoundException.java,f/b/fb74bf2b17cbc3f7af36de3445dd485a28c2e776
 ƒ
@@ -75,8 +73,6 @@ R
 ".github/workflows/ci-run-tests.yml,0/a/0a3558edd638d964a660178e736644e55a9cd20a
 U
 %.github/workflows/ci-pull-request.yml,b/3/b34df1e90d4b2d2699d3142e026268320f6c6d08
-‹
-[domain/src/test/java/com/kaua/template/domain/validation/handler/ValidationHandlerTest.java,5/a/5af33f0caf98a61bed6ac224860930c3521cf6a3
 ƒ
 Sdomain/src/test/java/com/kaua/template/domain/validation/ValidationHandlerTest.java,9/2/9256538810546991eb63aa446857317dd5d41013
 :
