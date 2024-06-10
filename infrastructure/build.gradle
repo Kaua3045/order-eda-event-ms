@@ -3,7 +3,7 @@ plugins {
     id 'java-conventions'
 }
 
-group = 'com.kaua.template.infrastructure'
+group = 'com.kaua.order.infrastructure'
 
 repositories {
     mavenCentral()
@@ -21,8 +21,8 @@ testCodeCoverageReport {
         classDirectories.setFrom(
                 files(classDirectories.files.collect {
                     fileTree(dir: it, exclude: [
-                            'com/kaua/template/infrastructure/configurations/*',
-                            'com/kaua/template/infrastructure/Main.class'
+                            'com/kaua/order/infrastructure/configurations/*',
+                            'com/kaua/order/infrastructure/Main.class'
                     ])
                 })
         )
@@ -34,8 +34,8 @@ jacocoTestCoverageVerification {
         classDirectories.setFrom(
                 files(classDirectories.files.collect {
                     fileTree(dir: it, exclude: [
-                            'com/kaua/template/infrastructure/configurations/*',
-                            'com/kaua/template/infrastructure/Main.class'
+                            'com/kaua/order/infrastructure/configurations/*',
+                            'com/kaua/order/infrastructure/Main.class'
                     ])
                 })
         )
