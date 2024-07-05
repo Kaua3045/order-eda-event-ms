@@ -1,4 +1,4 @@
-rootProject.name = 'java-template-modules-clean-arch'
+rootProject.name = 'order-eda-event-ms'
 include 'domain'
 include 'application'
 include 'infrastructure'
