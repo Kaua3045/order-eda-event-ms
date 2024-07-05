@@ -133,6 +133,27 @@ public class EntityTest extends UnitTest {
         Assertions.assertEquals(1, aggregateRoot.getVersion());
     }
 
+    @Test
+    void testSetEntityVersion() {
+        SampleIdentifier sampleId = new SampleIdentifier(UUID.randomUUID().toString());
+        Entity<SampleIdentifier> entity = createEntity(sampleId);
+
+        entity.setVersion(1);
+
+        Assertions.assertEquals(1, entity.getVersion());
+    }
+
+    @Test
+    void testIncrementEntityVersion() {
+        SampleIdentifier sampleId = new SampleIdentifier(UUID.randomUUID().toString());
+        Entity<SampleIdentifier> entity = createEntity(sampleId);
+
+        final var aOutput = entity.incrementVersion();
+
+        Assertions.assertEquals(1, aOutput);
+        Assertions.assertEquals(1, entity.getVersion());
+    }
+
     private Entity<SampleIdentifier> createEntity(SampleIdentifier id) {
         return new Entity<>(id, 0, Collections.emptyList()) {
             @Override
@@ -155,15 +176,15 @@ public class EntityTest extends UnitTest {
     }
 
     private record SampleEntityEvent(
-            String id, String eventId, String eventType, Instant occurredOn,
-            long aggregateVersion, String source, String traceId) implements DomainEvent {
+            String aggregateId, String eventId, String eventType, Instant occurredOn,
+            long aggregateVersion, String who, String traceId) implements DomainEvent {
 
         public SampleEntityEvent(final String id) {
             this(id, IdUtils.generateIdWithoutHyphen(),
                     "SampleEntityEvent",
                     InstantUtils.now(),
                     1,
-                    "SampleEntityService",
+                    "user teste",
                     IdUtils.generateIdWithoutHyphen());
         }
     }

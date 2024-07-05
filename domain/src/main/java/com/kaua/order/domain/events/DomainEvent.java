@@ -4,17 +4,17 @@ import java.time.Instant;
 
 public interface DomainEvent {
 
-    String eventId(); // event identifier (UUID)
+    String aggregateId();
 
-    String eventType(); // event type (OrderCreated, OrderUpdated, OrderDeleted, etc.)
+    String eventId();
 
-    Instant occurredOn(); // event occurred date (2021-07-01T00:00:00Z)
+    String eventType();
 
-    long aggregateVersion(); // event/aggregate version (1, 2, 3, etc.)
+    Instant occurredOn();
 
-    String source(); // event source (OrderService, PaymentService, etc.) talvez não seja preciso
+    long aggregateVersion();
 
-    String traceId(); // trace identifier (UUID) podemos colocar se quiser
+    String who();
 
-    // podemos colocar o email ou name do user que gerou o evento
+    String traceId();
 }

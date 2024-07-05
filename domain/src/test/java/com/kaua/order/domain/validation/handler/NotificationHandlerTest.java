@@ -88,7 +88,7 @@ public class NotificationHandlerTest extends UnitTest {
 
     @Test
     void givenAValidValidation_whenCallValidate_thenShouldThrowsException() {
-        final var expectedErrorMessage = "Cannot invoke \"com.kaua.template.domain.validation.ValidationHandler$Validation.validate()\" because \"aValidation\" is null";
+        final var expectedErrorMessage = "Cannot invoke \"com.kaua.order.domain.validation.ValidationHandler$Validation.validate()\" because \"aValidation\" is null";
         NotificationHandler handler = NotificationHandler.create();
 
         Assertions.assertDoesNotThrow(() -> handler.validate(null));
