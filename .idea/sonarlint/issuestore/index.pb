@@ -236,3 +236,5 @@ Pinfrastructure/src/test/java/com/kaua/order/infrastructure/api/EventAPITest.jav
 einfrastructure/src/main/java/com/kaua/order/infrastructure/listeners/OrderExternalEventsListener.java,3/f/3fd65d7dea4a941cf057674575f8e41bc72ceaab
 ™
 iinfrastructure/src/test/java/com/kaua/order/infrastructure/listeners/OrderExternalEventsListenerTest.java,7/8/78d42c841b6ae8f3198e93921251194a3a7eba6c
+‚
+Rinfrastructure/src/test/java/com/kaua/order/infrastructure/utils/ApiErrorTest.java,1/2/12b5dc7a704642b1b5f5d90d4c6b3bc23145a3c0

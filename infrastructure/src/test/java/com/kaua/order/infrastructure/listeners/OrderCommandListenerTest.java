@@ -93,10 +93,7 @@ public class OrderCommandListenerTest extends AbstractEmbeddedKafkaTest {
         final var aProducerRecord = createProducerRecord(
                 topic,
                 aMessage,
-                aCreateOrderCommand,
-                HeadersConstants.COMMAND_ID,
-                HeadersConstants.COMMAND_TYPE,
-                HeadersConstants.COMMAND_OCCURRED_ON
+                aCreateOrderCommand
         );
         producer().send(aProducerRecord).get(1, TimeUnit.MINUTES);
 
@@ -145,10 +142,7 @@ public class OrderCommandListenerTest extends AbstractEmbeddedKafkaTest {
         final var aProducerRecord = createProducerRecord(
                 topic,
                 aMessage,
-                aCreateOrderCommand,
-                HeadersConstants.COMMAND_ID,
-                HeadersConstants.COMMAND_TYPE,
-                HeadersConstants.COMMAND_OCCURRED_ON
+                aCreateOrderCommand
         );
         producer().send(aProducerRecord).get(1, TimeUnit.MINUTES);
 
@@ -174,10 +168,7 @@ public class OrderCommandListenerTest extends AbstractEmbeddedKafkaTest {
         final var aConsumerRecord = createConsumerRecord(
                 topic,
                 aMessage,
-                aCommand,
-                HeadersConstants.COMMAND_ID,
-                HeadersConstants.COMMAND_TYPE,
-                HeadersConstants.COMMAND_OCCURRED_ON
+                aCommand
         );
         final var aOrderCommandListener = new OrderCommandListener(
                 kafkaTemplate,
@@ -221,10 +212,7 @@ public class OrderCommandListenerTest extends AbstractEmbeddedKafkaTest {
         final var aConsumerRecord = createConsumerRecord(
                 topic,
                 aMessage,
-                aCreateOrderCommand,
-                HeadersConstants.COMMAND_ID,
-                HeadersConstants.COMMAND_TYPE,
-                HeadersConstants.COMMAND_OCCURRED_ON
+                aCreateOrderCommand
         );
         final var aOrderCommandListener = new OrderCommandListener(
                 kafkaTemplate,
