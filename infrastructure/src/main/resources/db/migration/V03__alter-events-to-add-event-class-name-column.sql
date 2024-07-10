@@ -1,0 +1,1 @@
+ALTER TABLE events ADD COLUMN event_class_name VARCHAR(255) NOT NULL;
