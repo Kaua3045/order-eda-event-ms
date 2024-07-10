@@ -139,6 +139,7 @@ public class EventsJpaEntity {
         return "EventsJpaEntity(" +
                 "eventId='" + eventId + '\'' +
                 ", eventType='" + eventType + '\'' +
+                ", eventClassName='" + eventClassName + '\'' +
                 ", aggregateId='" + aggregateId + '\'' +
                 ", aggregateVersion=" + aggregateVersion +
                 ", occurredOn=" + occurredOn +
