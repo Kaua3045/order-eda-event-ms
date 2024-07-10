@@ -79,6 +79,7 @@ public class OrderCommandListener extends EventListener {
 
                     log.debug("Deserialized command and handling: {}", aCommand);
                     this.asyncCreateOrderHandler.handle(aCommand);
+                    ack.acknowledge();
                     log.info("CreateOrderCommand processed {}", aCommand);
                 }
                 default -> handleMessagingTypeNotSupported(
