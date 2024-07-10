@@ -241,7 +241,7 @@ public class Order extends AggregateRoot<OrderId> {
                 ", items=" + items.size() +
                 ", shippingAddress=" + shippingAddress.toString() +
                 ", totalAmount=" + totalAmount +
-                ", coupon=" + coupon.toString() +
+                ", coupon=" + getCoupon().orElse(null) +
                 ", paymentDetails=" + paymentDetails.toString() +
                 ", shippingDetails=" + shippingDetails.toString() +
                 ", deliveredAt=" + deliveredAt +
