@@ -1,6 +1,5 @@
 package com.kaua.order.domain.order.valueobjects;
 
-import com.kaua.order.domain.ValueObject;
 import com.kaua.order.domain.exceptions.NotificationException;
 import com.kaua.order.domain.validation.Error;
 import com.kaua.order.domain.validation.handler.NotificationHandler;
@@ -8,25 +7,12 @@ import com.kaua.order.domain.validation.handler.NotificationHandler;
 import java.math.BigDecimal;
 import java.util.Optional;
 
-public class OrderShippingDetails extends ValueObject {
-
-    private final String shippingId;
-    private final String shippingCompany;
-    private final String shippingType;
-    private final BigDecimal cost;
-
-    private OrderShippingDetails(
-            final String aShippingId,
-            final String aShippingCompany,
-            final String aShippingType,
-            final BigDecimal aCost
-    ) {
-        this.shippingId = aShippingId;
-        this.shippingCompany = aShippingCompany;
-        this.shippingType = aShippingType;
-        this.cost = aCost;
-        validate();
-    }
+public record OrderShippingDetails(
+        String shippingId,
+        String shippingCompany,
+        String shippingType,
+        BigDecimal cost
+) {
 
     public static OrderShippingDetails create(
             final String aShippingId,
@@ -34,14 +20,18 @@ public class OrderShippingDetails extends ValueObject {
             final String aShippingType,
             final BigDecimal aCost
     ) {
-        return new OrderShippingDetails(aShippingId, aShippingCompany, aShippingType, aCost);
+        final var aDetails = new OrderShippingDetails(aShippingId, aShippingCompany, aShippingType, aCost);
+        aDetails.validate();
+        return aDetails;
     }
 
     public static OrderShippingDetails create(
             final String aShippingCompany,
             final String aShippingType
     ) {
-        return new OrderShippingDetails(null, aShippingCompany, aShippingType, BigDecimal.ZERO);
+        final var aDetails = new OrderShippingDetails(null, aShippingCompany, aShippingType, BigDecimal.ZERO);
+        aDetails.validate();
+        return aDetails;
     }
 
     public static OrderShippingDetails create(
@@ -49,7 +39,9 @@ public class OrderShippingDetails extends ValueObject {
             final String aShippingType,
             final BigDecimal aCost
     ) {
-        return new OrderShippingDetails(null, aShippingCompany, aShippingType, aCost);
+        final var aDetails = new OrderShippingDetails(null, aShippingCompany, aShippingType, aCost);
+        aDetails.validate();
+        return aDetails;
     }
 
     public Optional<String> getShippingId() {

@@ -1,37 +1,19 @@
 package com.kaua.order.domain.order.valueobjects;
 
-import com.kaua.order.domain.ValueObject;
 import com.kaua.order.domain.exceptions.NotificationException;
 import com.kaua.order.domain.validation.Error;
 import com.kaua.order.domain.validation.handler.NotificationHandler;
 
 import java.util.Optional;
 
-public class OrderAddress extends ValueObject {
-
-    private final String street;
-    private final String number;
-    private final String complement;
-    private final String city;
-    private final String state;
-    private final String zipCode;
-
-    private OrderAddress(
-            final String street,
-            final String number,
-            final String complement,
-            final String city,
-            final String state,
-            final String zipCode
-    ) {
-        this.street = street;
-        this.number = number;
-        this.complement = complement;
-        this.city = city;
-        this.state = state;
-        this.zipCode = zipCode;
-        validate();
-    }
+public record OrderAddress(
+        String street,
+        String number,
+        String complement,
+        String city,
+        String state,
+        String zipCode
+) {
 
     public static OrderAddress create(
             final String street,
@@ -41,7 +23,9 @@ public class OrderAddress extends ValueObject {
             final String state,
             final String zipCode
     ) {
-        return new OrderAddress(street, number, complement, city, state, zipCode);
+        final var aAddress = new OrderAddress(street, number, complement, city, state, zipCode);
+        aAddress.validate();
+        return aAddress;
     }
 
     public String getStreet() {

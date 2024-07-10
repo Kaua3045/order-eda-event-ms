@@ -1,23 +1,18 @@
 package com.kaua.order.domain.order.valueobjects;
 
-import com.kaua.order.domain.ValueObject;
 import com.kaua.order.domain.exceptions.NotificationException;
 import com.kaua.order.domain.validation.Error;
 import com.kaua.order.domain.validation.handler.NotificationHandler;
 
-public class OrderCoupon extends ValueObject {
-
-    private final String code;
-    private final float percentage;
-
-    private OrderCoupon(final String aCode, final float aPercentage) {
-        this.code = aCode;
-        this.percentage = aPercentage;
-        validate();
-    }
+public record OrderCoupon(
+        String code,
+        float percentage
+) {
 
     public static OrderCoupon create(final String aCode, final float aPercentage) {
-        return new OrderCoupon(aCode, aPercentage);
+        final var aCoupon = new OrderCoupon(aCode, aPercentage);
+        aCoupon.validate();
+        return aCoupon;
     }
 
     public String getCode() {

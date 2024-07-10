@@ -1,6 +1,5 @@
 package com.kaua.order.domain.order.valueobjects;
 
-import com.kaua.order.domain.ValueObject;
 import com.kaua.order.domain.exceptions.NotificationException;
 import com.kaua.order.domain.validation.Error;
 import com.kaua.order.domain.validation.handler.NotificationHandler;
@@ -8,25 +7,12 @@ import com.kaua.order.domain.validation.handler.NotificationHandler;
 import java.math.BigDecimal;
 import java.util.Optional;
 
-public class OrderPaymentDetails extends ValueObject {
-
-    private final String paymentId;
-    private final String paymentMethodId;
-    private final int installments;
-    private final BigDecimal tax;
-
-    private OrderPaymentDetails(
-            final String aPaymentId,
-            final String aPaymentMethodId,
-            final int aInstallments,
-            final BigDecimal aTax
-    ) {
-        this.paymentId = aPaymentId;
-        this.paymentMethodId = aPaymentMethodId;
-        this.installments = aInstallments;
-        this.tax = aTax;
-        validate();
-    }
+public record OrderPaymentDetails(
+        String paymentId,
+        String paymentMethodId,
+        int installments,
+        BigDecimal tax
+) {
 
     public static OrderPaymentDetails create(
             final String aPaymentId,
@@ -34,7 +20,9 @@ public class OrderPaymentDetails extends ValueObject {
             final int aInstallments,
             final BigDecimal aTax
     ) {
-        return new OrderPaymentDetails(aPaymentId, aPaymentMethodId, aInstallments, aTax);
+        final var aDetails = new OrderPaymentDetails(aPaymentId, aPaymentMethodId, aInstallments, aTax);
+        aDetails.validate();
+        return aDetails;
     }
 
     public static OrderPaymentDetails create(
@@ -42,14 +30,18 @@ public class OrderPaymentDetails extends ValueObject {
             final int aInstallments,
             final BigDecimal aTax
     ) {
-        return new OrderPaymentDetails(null, aPaymentMethodId, aInstallments, aTax);
+        final var aDetails = new OrderPaymentDetails(null, aPaymentMethodId, aInstallments, aTax);
+        aDetails.validate();
+        return aDetails;
     }
 
     public static OrderPaymentDetails create(
             final String aPaymentMethodId,
             final int aInstallments
     ) {
-        return new OrderPaymentDetails(null, aPaymentMethodId, aInstallments, BigDecimal.ZERO);
+        final var aDetails = new OrderPaymentDetails(null, aPaymentMethodId, aInstallments, BigDecimal.ZERO);
+        aDetails.validate();
+        return aDetails;
     }
 
     public Optional<String> getPaymentId() {
