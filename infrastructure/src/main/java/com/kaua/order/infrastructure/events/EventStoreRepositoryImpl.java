@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 public class EventStoreRepositoryImpl implements EventStore {
@@ -69,7 +70,8 @@ public class EventStoreRepositoryImpl implements EventStore {
 
     @Override
     public <T extends AggregateRoot<?>> void save(T aggregate) {
-        log.debug("Storing events for aggregate {}", aggregate.getId().getValue());
+        log.debug("Storing events for aggregate {} and version {}",
+                aggregate.getId().getValue(), aggregate.getVersion());
 
         if (aggregate.getVersion() > 0) {
             log.debug("Handling concurrency for aggregate {}, actual version {}",
@@ -81,6 +83,17 @@ public class EventStoreRepositoryImpl implements EventStore {
         // todo: check to store snapshot
 
         log.info("Aggregate {} stored {}", aggregate.getId().getValue(), aggregate);
+    }
+
+    @Override
+    public <T extends DomainEvent> List<T> loadEvents(String aggregateId) {
+        // TODO: in future we can use snapshot to load events
+        log.debug("Loading events for aggregate {}", aggregateId);
+        final var aEvents = this.eventsRepository.findByAggregateId(aggregateId)
+                .stream().map(it -> (T) it.toDomainEvent())
+                .collect(Collectors.toList());
+        log.info("Events {} for aggregate {} loaded", aEvents.size(), aggregateId);
+        return aEvents;
     }
 
     private void handleConcurrency(final String aggregateId) {
