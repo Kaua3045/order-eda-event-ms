@@ -94,6 +94,42 @@ public class EventStoreRepositoryImplTest {
                 () -> this.eventStoreRepository.save(aAggregate));
     }
 
+    @Test
+    void givenAValidAggregateId_whenCallLoadEvents_thenShouldReturnEventsForAggregateId() {
+        final var aAggregate = createAggregate(IdUtils.generateIdWithoutHyphen(), 0);
+        aAggregate.registerEvent(Fixture.sampleEntityEvent(aAggregate.getId().getValue(), 1));
+
+        Assertions.assertEquals(0, this.eventsJpaRepository.count());
+
+        this.eventStoreRepository.save(aAggregate);
+
+        Assertions.assertEquals(2, this.eventsJpaRepository.count());
+
+        final var aEvents = this.eventStoreRepository.loadEvents(aAggregate.getId().getValue());
+
+        Assertions.assertEquals(2, aEvents.size());
+    }
+
+    @Test
+    void givenAnInvalidEventClassNameInEvent_whenCallLoadEvents_thenShouldThrowException() {
+        final var aAggregate = createAggregate(IdUtils.generateIdWithoutHyphen(), 0);
+        final var aAggregateId = aAggregate.getId().value;
+        aAggregate.registerEvent(Fixture.sampleEntityEvent(aAggregateId, 1));
+
+        Assertions.assertEquals(0, this.eventsJpaRepository.count());
+
+        this.eventStoreRepository.save(aAggregate);
+
+        Assertions.assertEquals(2, this.eventsJpaRepository.count());
+
+        this.eventsJpaRepository.findAll().forEach(e -> e.setEventClassName("InvalidClassName"));
+
+        this.eventsJpaRepository.saveAll(this.eventsJpaRepository.findAll());
+
+        Assertions.assertThrows(EventStoreException.class,
+                () -> this.eventStoreRepository.loadEvents(aAggregateId));
+    }
+
     private void doSyncAndConcurrently(
             final int threadCount,
             final Consumer<String> operation,
