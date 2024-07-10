@@ -13,6 +13,15 @@ kafka:
       group-id: orders-commands-group
       max-attempts: 4
       auto-create-topics: false
+    orders-external-events:
+      auto-offset-reset: earliest
+      concurrency: 1
+      id: kafka-listener-orders-external-events-${INSTANCE_ID:1}
+      topics:
+        - shipping-cost-calculated-external-event-topic
+      group-id: orders-external-events-group
+      max-attempts: 4
+      auto-create-topics: false
 
 server:
   port: 8080
