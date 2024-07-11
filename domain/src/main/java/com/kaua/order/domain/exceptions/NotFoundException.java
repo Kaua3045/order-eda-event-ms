@@ -21,4 +21,13 @@ public class NotFoundException extends DomainException {
 
         return () -> new NotFoundException(aError, Collections.emptyList());
     }
+
+    public static Supplier<NotFoundException> with(
+            final String anAggregate,
+            final String id
+    ) {
+        final var aError = "%s with id %s was not found".formatted(anAggregate, id);
+
+        return () -> new NotFoundException(aError, Collections.emptyList());
+    }
 }

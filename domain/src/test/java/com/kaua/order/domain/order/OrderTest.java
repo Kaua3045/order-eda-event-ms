@@ -5,6 +5,8 @@ import com.kaua.order.domain.events.DomainEvent;
 import com.kaua.order.domain.exceptions.DomainException;
 import com.kaua.order.domain.exceptions.UnknownEventReceivedException;
 import com.kaua.order.domain.order.events.OrderCreationInitiatedEvent;
+import com.kaua.order.domain.order.events.OrderShippingCostCalculatedEvent;
+import com.kaua.order.domain.order.events.external.ShippingCostCalculatedEvent;
 import com.kaua.order.domain.order.identifiers.OrderId;
 import com.kaua.order.domain.order.valueobjects.OrderAddress;
 import com.kaua.order.domain.order.valueobjects.OrderCoupon;
@@ -280,13 +282,162 @@ public class OrderTest extends UnitTest {
         Assertions.assertNotNull(aOrder.toString());
     }
 
+    @Test
+    void givenAValidShippingCostCalculatedEvent_whenCallHandle_thenHandleEventAndRegisterInternalEvent() {
+        final var aOrderId = IdUtils.generateIdWithoutHyphen();
+        final var aOrderVersion = 0;
+        final var aOrderStatus = OrderStatus.CREATION_INITIATED;
+        final var aCustomerId = "123";
+        final var aOrderItems = Set.of(
+                OrderItem.create("sku", 2, BigDecimal.TEN)
+        );
+        final var aOrderAddress = OrderAddress.create(
+                "street",
+                "number",
+                "complement",
+                "city",
+                "state",
+                "zipCode"
+        );
+
+        final var aOrderPaymentDetails = OrderPaymentDetails.create(
+                "paymentMethodId",
+                1
+        );
+        final var aOrderShippingDetails = OrderShippingDetails.create(
+                "shippingCompany",
+                "shippingType"
+        );
+
+        final var aTraceId = IdUtils.generateIdWithHyphen();
+
+        final var aOrderCreationInitiatedEvent = OrderCreationInitiatedEvent.from(
+                aOrderId,
+                aOrderStatus.name(),
+                aCustomerId,
+                new BigDecimal("20.00"),
+                aOrderItems,
+                aOrderAddress,
+                null,
+                aOrderPaymentDetails,
+                aOrderShippingDetails,
+                aOrderVersion,
+                aCustomerId,
+                aTraceId
+        );
+
+        final var aEvents = new ArrayList<DomainEvent>();
+        aEvents.add(aOrderCreationInitiatedEvent);
+
+        final var aOrder = Order.reconstruct(aEvents);
+
+        final var aShippingCostCalculatedEvent = ShippingCostCalculatedEvent.from(
+                aOrderId,
+                aOrderStatus.name(),
+                aOrder.getTotalAmount(),
+                aOrder.getShippingAddress(),
+                OrderShippingDetails.create(
+                        aOrderShippingDetails.getShippingCompany(),
+                        aOrderShippingDetails.getShippingType(),
+                        new BigDecimal("2.00")
+                ),
+                aOrderVersion,
+                aCustomerId,
+                aTraceId
+        );
+
+        aOrder.handle(aShippingCostCalculatedEvent);
+
+        Assertions.assertEquals(new BigDecimal("22.00"), aOrder.getTotalAmount());
+        Assertions.assertEquals(1, aOrder.getDomainEvents().size());
+        Assertions.assertInstanceOf(OrderShippingCostCalculatedEvent.class, aOrder.getDomainEvents().get(0));
+        Assertions.assertEquals(1, aOrder.getVersion());
+    }
+
+    @Test
+    void givenAValidOrderShippingCostCalculatedEvent_whenCallReconstruct_thenOrderIsReconstructed() {
+        final var aOrderId = IdUtils.generateIdWithoutHyphen();
+        final var aOrderVersion = 0;
+        final var aOrderStatus = OrderStatus.CREATION_INITIATED;
+        final var aCustomerId = "123";
+        final var aOrderItems = Set.of(
+                OrderItem.create("sku", 2, BigDecimal.TEN)
+        );
+        final var aOrderAddress = OrderAddress.create(
+                "street",
+                "number",
+                "complement",
+                "city",
+                "state",
+                "zipCode"
+        );
+
+        final var aOrderPaymentDetails = OrderPaymentDetails.create(
+                "paymentMethodId",
+                1
+        );
+        final var aOrderShippingDetails = OrderShippingDetails.create(
+                "shippingCompany",
+                "shippingType"
+        );
+
+        final var aTraceId = IdUtils.generateIdWithHyphen();
+
+        final var aOrderCreationInitiatedEvent = OrderCreationInitiatedEvent.from(
+                aOrderId,
+                aOrderStatus.name(),
+                aCustomerId,
+                new BigDecimal("20.00"),
+                aOrderItems,
+                aOrderAddress,
+                null,
+                aOrderPaymentDetails,
+                aOrderShippingDetails,
+                aOrderVersion,
+                aCustomerId,
+                aTraceId
+        );
+
+        final var aShippingCostCalculatedEvent = OrderShippingCostCalculatedEvent.from(
+                aOrderId,
+                OrderStatus.SHIPPING_CALCULATED.name(),
+                new BigDecimal("22.00"),
+                aOrderAddress,
+                aOrderPaymentDetails,
+                OrderShippingDetails.create(
+                        aOrderShippingDetails.getShippingCompany(),
+                        aOrderShippingDetails.getShippingType(),
+                        new BigDecimal("2.00")
+                ),
+                1,
+                aCustomerId,
+                aTraceId
+        );
+
+        final var aEvents = new ArrayList<DomainEvent>();
+        aEvents.add(aOrderCreationInitiatedEvent);
+        aEvents.add(aShippingCostCalculatedEvent);
+
+        final var aOrder = Order.reconstruct(aEvents);
+
+        Assertions.assertNotNull(aOrder);
+        Assertions.assertEquals(aOrderId, aOrder.getId().getValue());
+        Assertions.assertEquals(1, aOrder.getVersion());
+        Assertions.assertEquals(OrderStatus.SHIPPING_CALCULATED, aOrder.getStatus());
+        Assertions.assertEquals(aCustomerId, aOrder.getCustomerId());
+        Assertions.assertEquals(aOrderItems, aOrder.getItems());
+        Assertions.assertEquals(aOrderAddress, aOrder.getShippingAddress());
+        Assertions.assertEquals(new BigDecimal("22.00"), aOrder.getTotalAmount());
+    }
+
     private record SampleEntityEvent(
-            String aggregateId, String eventId, String eventType, Instant occurredOn,
+            String aggregateId, String eventId, String eventType, String eventClassName, Instant occurredOn,
             long aggregateVersion, String who, String traceId) implements DomainEvent {
 
         public SampleEntityEvent(final String id) {
             this(id, IdUtils.generateIdWithoutHyphen(),
                     "SampleEntityEvent",
+                    SampleEntityEvent.class.getName(),
                     InstantUtils.now(),
                     1,
                     "user teste",

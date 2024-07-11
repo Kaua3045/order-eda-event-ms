@@ -58,6 +58,26 @@ public class EventsJpaRepositoryTest {
     }
 
     @Test
+    void givenAnInvalidNullEventClassName_whenCallSave_shouldReturnAnException() {
+        final var expectedPropertyName = "eventClassName";
+        final var expectedErrorMessage = "not-null property references a null or transient value : com.kaua.order.infrastructure.events.persistence.EventsJpaEntity.eventClassName";
+
+        final var aDomainEvent = Fixture.sampleEntityEvent(IdUtils.generateIdWithHyphen(), 0);
+
+        final var aEntity = EventsJpaEntity.with(aDomainEvent);
+        aEntity.setEventClassName(null);
+
+        final var actualException = Assertions.assertThrows(DataIntegrityViolationException.class,
+                () -> eventsJpaRepository.save(aEntity));
+
+        final var actualCause = Assertions.assertInstanceOf(PropertyValueException.class,
+                actualException.getCause());
+
+        Assertions.assertEquals(expectedPropertyName, actualCause.getPropertyName());
+        Assertions.assertEquals(expectedErrorMessage, actualCause.getMessage());
+    }
+
+    @Test
     void givenAnInvalidNullAggregateId_whenCallSave_shouldReturnAnException() {
         final var expectedPropertyName = "aggregateId";
         final var expectedErrorMessage = "not-null property references a null or transient value : com.kaua.order.infrastructure.events.persistence.EventsJpaEntity.aggregateId";

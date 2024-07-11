@@ -1,6 +1,8 @@
 package com.kaua.order.infrastructure;
 
 import com.kaua.order.domain.commands.InternalCommand;
+import com.kaua.order.domain.events.DomainEvent;
+import com.kaua.order.infrastructure.constants.HeadersConstants;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.RecordsToDelete;
@@ -69,30 +71,49 @@ public abstract class AbstractEmbeddedKafkaTest {
     protected ProducerRecord<String, String> createProducerRecord(
             final String aTopic,
             final String aMessage,
-            final InternalCommand aCommand,
-            final String aIdHeader,
-            final String aTypeHeader,
-            final String aOccurredOnHeader
+            final DomainEvent aEvent
     ) {
         final var aProducerRecord = new ProducerRecord<String, String>(aTopic, aMessage);
-        aProducerRecord.headers().add(aIdHeader, aCommand.commandId().getBytes());
-        aProducerRecord.headers().add(aTypeHeader, aCommand.commandType().getBytes());
-        aProducerRecord.headers().add(aOccurredOnHeader, aCommand.occurredOn().toString().getBytes());
+        aProducerRecord.headers().add(HeadersConstants.EVENT_ID, aEvent.eventId().getBytes());
+        aProducerRecord.headers().add(HeadersConstants.EVENT_TYPE, aEvent.eventType().getBytes());
+        aProducerRecord.headers().add(HeadersConstants.EVENT_OCCURRED_ON, aEvent.occurredOn().toString().getBytes());
+        return aProducerRecord;
+    }
+
+    protected ProducerRecord<String, String> createProducerRecord(
+            final String aTopic,
+            final String aMessage,
+            final InternalCommand aCommand
+    ) {
+        final var aProducerRecord = new ProducerRecord<String, String>(aTopic, aMessage);
+        aProducerRecord.headers().add(HeadersConstants.COMMAND_ID, aCommand.commandId().getBytes());
+        aProducerRecord.headers().add(HeadersConstants.COMMAND_TYPE, aCommand.commandType().getBytes());
+        aProducerRecord.headers().add(HeadersConstants.COMMAND_OCCURRED_ON, aCommand.occurredOn().toString().getBytes());
         return aProducerRecord;
     }
 
     protected ConsumerRecord<String, String> createConsumerRecord(
             final String aTopic,
             final String aMessage,
-            final InternalCommand aCommand,
-            final String aIdHeader,
-            final String aTypeHeader,
-            final String aOccurredOnHeader
+            final InternalCommand aCommand
     ) {
         final var aConsumerRecord = new ConsumerRecord<String, String>(aTopic, 1, 0, null, aMessage);
-        aConsumerRecord.headers().add(aIdHeader, aCommand.commandId().getBytes());
-        aConsumerRecord.headers().add(aTypeHeader, aCommand.commandType().getBytes());
-        aConsumerRecord.headers().add(aOccurredOnHeader, aCommand.occurredOn().toString().getBytes());
+        aConsumerRecord.headers().add(HeadersConstants.COMMAND_ID, aCommand.commandId().getBytes());
+        aConsumerRecord.headers().add(HeadersConstants.COMMAND_TYPE, aCommand.commandType().getBytes());
+        aConsumerRecord.headers().add(HeadersConstants.COMMAND_OCCURRED_ON, aCommand.occurredOn().toString().getBytes());
+        aConsumerRecord.headers().add("kafka_original-topic", aTopic.getBytes());
+        return aConsumerRecord;
+    }
+
+    protected ConsumerRecord<String, String> createConsumerRecord(
+            final String aTopic,
+            final String aMessage,
+            final DomainEvent aEvent
+    ) {
+        final var aConsumerRecord = new ConsumerRecord<String, String>(aTopic, 1, 0, null, aMessage);
+        aConsumerRecord.headers().add(HeadersConstants.EVENT_ID, aEvent.eventId().getBytes());
+        aConsumerRecord.headers().add(HeadersConstants.EVENT_TYPE, aEvent.eventType().getBytes());
+        aConsumerRecord.headers().add(HeadersConstants.EVENT_OCCURRED_ON, aEvent.occurredOn().toString().getBytes());
         aConsumerRecord.headers().add("kafka_original-topic", aTopic.getBytes());
         return aConsumerRecord;
     }

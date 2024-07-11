@@ -176,12 +176,13 @@ public class EntityTest extends UnitTest {
     }
 
     private record SampleEntityEvent(
-            String aggregateId, String eventId, String eventType, Instant occurredOn,
+            String aggregateId, String eventId, String eventType, String eventClassName, Instant occurredOn,
             long aggregateVersion, String who, String traceId) implements DomainEvent {
 
         public SampleEntityEvent(final String id) {
             this(id, IdUtils.generateIdWithoutHyphen(),
                     "SampleEntityEvent",
+                    SampleEntityEvent.class.getName(),
                     InstantUtils.now(),
                     1,
                     "user teste",

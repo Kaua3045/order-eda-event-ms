@@ -2,6 +2,8 @@ kafka:
   consumers:
     orders-commands:
       auto-create-topics: true
+    orders-external-events:
+      auto-create-topics: true
 
 logging:
   level:

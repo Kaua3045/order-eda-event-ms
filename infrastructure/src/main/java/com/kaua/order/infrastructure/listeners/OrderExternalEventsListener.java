@@ -1,7 +1,7 @@
 package com.kaua.order.infrastructure.listeners;
 
-import com.kaua.order.application.handlers.commands.CreateOrderCommand;
-import com.kaua.order.application.handlers.create.AsyncCreateOrderHandler;
+import com.kaua.order.application.handlers.update.shippingcost.ShippingCostOrderHandler;
+import com.kaua.order.domain.order.events.external.ShippingCostCalculatedEvent;
 import com.kaua.order.infrastructure.configurations.json.Json;
 import com.kaua.order.infrastructure.constants.HeadersConstants;
 import com.kaua.order.infrastructure.exceptions.KafkaHeadersException;
@@ -22,40 +22,40 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 @Component
-public class OrderCommandListener extends EventListener {
+public class OrderExternalEventsListener extends EventListener {
 
-    private static final Logger log = LoggerFactory.getLogger(OrderCommandListener.class);
+    private static final Logger log = LoggerFactory.getLogger(OrderExternalEventsListener.class);
 
-    private static final String ORDER_DLT_INVALID = "order-commands-dlt-invalid";
+    private static final String ORDER_DLT_INVALID = "order-external-events-dlt-invalid";
 
-    private final AsyncCreateOrderHandler asyncCreateOrderHandler;
+    private final ShippingCostOrderHandler shippingCostOrderHandler;
 
-    public OrderCommandListener(
+    public OrderExternalEventsListener(
             final KafkaTemplate<String, Object> kafkaTemplate,
-            final AsyncCreateOrderHandler asyncCreateOrderHandler
+            final ShippingCostOrderHandler shippingCostOrderHandler
     ) {
         super(kafkaTemplate);
-        this.asyncCreateOrderHandler = Objects.requireNonNull(asyncCreateOrderHandler);
+        this.shippingCostOrderHandler = Objects.requireNonNull(shippingCostOrderHandler);
     }
 
     @KafkaListener(
-            concurrency = "${kafka.consumers.orders-commands.concurrency}",
+            concurrency = "${kafka.consumers.orders-external-events.concurrency}",
             containerFactory = "kafkaListenerFactory",
             topics = {
-                    "${kafka.consumers.orders-commands.topics.[0]}",
+                    "${kafka.consumers.orders-external-events.topics.[0]}",
             },
-            groupId = "${kafka.consumers.orders-commands.group-id}",
+            groupId = "${kafka.consumers.orders-external-events.group-id}",
             // generate a random id for the consumer
-            id = "${kafka.consumers.orders-commands.id}-#{T(java.util.UUID).randomUUID().toString()}",
+            id = "${kafka.consumers.orders-external-events.id}-#{T(java.util.UUID).randomUUID().toString()}",
             properties = {
-                    "auto.offset.reset=${kafka.consumers.orders-commands.auto-offset-reset}"
+                    "auto.offset.reset=${kafka.consumers.orders-external-events.auto-offset-reset}"
             }
     )
     @RetryableTopic(
             // backoff delay 2 seconds, multiplier 2
             backoff = @Backoff(delay = 2000, multiplier = 2),
-            attempts = "${kafka.consumers.orders-commands.max-attempts}",
-            autoCreateTopics = "${kafka.consumers.orders-commands.auto-create-topics}",
+            attempts = "${kafka.consumers.orders-external-events.max-attempts}",
+            autoCreateTopics = "${kafka.consumers.orders-external-events.auto-create-topics}",
             dltTopicSuffix = "-retry-dlt",
             topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE
     )
@@ -68,29 +68,30 @@ public class OrderCommandListener extends EventListener {
 
         try {
             // TODO implement check inbox table to avoid processing duplicated messages
-            final var aCommandType = getTypeHeaderValue(record, HeadersConstants.COMMAND_TYPE);
+            final var aEventType = getTypeHeaderValue(record, HeadersConstants.EVENT_TYPE);
 
             final var aPayload = record.value();
 
-            switch (aCommandType) {
-                case CreateOrderCommand.COMMAND_TYPE -> {
-                    log.debug("Handling CreateOrderCommand");
-                    final var aCommand = Json.readValue(aPayload, CreateOrderCommand.class);
+            switch (aEventType) {
+                case ShippingCostCalculatedEvent.EVENT_TYPE -> {
+                    log.debug("Handling ShippingCostCalculatedEvent");
+                    final var aEvent = Json.readValue(aPayload, ShippingCostCalculatedEvent.class);
 
-                    log.debug("Deserialized command and handling: {}", aCommand);
-                    this.asyncCreateOrderHandler.handle(aCommand);
+                    log.debug("Deserialized event and handling: {}", aEvent);
+                    this.shippingCostOrderHandler.handle(aEvent);
                     ack.acknowledge();
-                    log.info("CreateOrderCommand processed {}", aCommand);
+                    // talvez aqui mostrar algo mais atualizado ou melhor
+                    log.info("ShippingCostCalculatedEvent processed {}", aEvent);
                 }
                 default -> handleMessagingTypeNotSupported(
                         record,
-                        aCommandType,
+                        aEventType,
                         ORDER_DLT_INVALID,
                         ack,
                         log,
-                        HeadersConstants.COMMAND_OCCURRED_ON,
-                        HeadersConstants.COMMAND_TYPE,
-                        HeadersConstants.COMMAND_ID
+                        HeadersConstants.EVENT_OCCURRED_ON,
+                        HeadersConstants.EVENT_TYPE,
+                        HeadersConstants.EVENT_ID
                 );
             }
         } catch (final KafkaHeadersException ex) {
@@ -126,8 +127,8 @@ public class OrderCommandListener extends EventListener {
                 aTopicRetry,
                 acknowledgment,
                 log,
-                HeadersConstants.COMMAND_TYPE,
-                HeadersConstants.COMMAND_ID
+                HeadersConstants.EVENT_TYPE,
+                HeadersConstants.EVENT_ID
         );
     }
 }

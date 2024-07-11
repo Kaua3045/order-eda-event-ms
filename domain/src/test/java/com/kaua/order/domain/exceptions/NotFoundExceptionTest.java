@@ -22,6 +22,19 @@ public class NotFoundExceptionTest extends UnitTest {
         Assertions.assertEquals(expectedErrorMessage, notFoundException.get().getMessage());
     }
 
+    @Test
+    void givenAValidAggregateStringName_whenCallNotFoundExceptionWith_ThenReturnNotFoundException() {
+        // given
+        final var aggregate = "SampleAggregate";
+        final var aId = "123";
+        final var expectedErrorMessage = "SampleAggregate with id 123 was not found";
+
+        // when
+        final var notFoundException = NotFoundException.with(aggregate, aId);
+        // then
+        Assertions.assertEquals(expectedErrorMessage, notFoundException.get().getMessage());
+    }
+
     static class SampleAggregate extends AggregateRoot<SampleIdentifier> {
         public SampleAggregate(SampleIdentifier id) {
             super(id);

@@ -21,10 +21,10 @@ jobs:
           distribution: 'temurin'
 
       - name: Run tests and calculate coverage for domain
-        run: ./gradlew :domain:test jacocoTestCoverageVerification
+        run: ./gradlew :domain:jacocoTestReport jacocoTestCoverageVerification
 
       - name: Run tests and calculate coverage for application
-        run: ./gradlew :application:test jacocoTestCoverageVerification
+        run: ./gradlew :application:jacocoTestReport jacocoTestCoverageVerification
 
       - name: Run tests and calculate coverage for infrastructure
-        run: ./gradlew :infrastructure:test jacocoTestCoverageVerification
+        run: ./gradlew :infrastructure:jacocoTestReport jacocoTestCoverageVerification

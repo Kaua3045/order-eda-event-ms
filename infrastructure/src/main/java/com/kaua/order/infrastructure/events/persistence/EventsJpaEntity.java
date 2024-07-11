@@ -2,6 +2,7 @@ package com.kaua.order.infrastructure.events.persistence;
 
 import com.kaua.order.domain.events.DomainEvent;
 import com.kaua.order.infrastructure.configurations.json.Json;
+import com.kaua.order.infrastructure.exceptions.EventStoreException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -20,6 +21,9 @@ public class EventsJpaEntity {
     @Column(name = "event_type", nullable = false)
     private String eventType;
 
+    @Column(name = "event_class_name", nullable = false)
+    private String eventClassName;
+
     @Column(name = "aggregate_id", nullable = false)
     private String aggregateId;
 
@@ -37,6 +41,7 @@ public class EventsJpaEntity {
     private EventsJpaEntity(
             final String eventId,
             final String eventType,
+            final String eventClassName,
             final String aggregateId,
             final long aggregateVersion,
             final Instant occurredOn,
@@ -44,6 +49,7 @@ public class EventsJpaEntity {
     ) {
         this.eventId = eventId;
         this.eventType = eventType;
+        this.eventClassName = eventClassName;
         this.aggregateId = aggregateId;
         this.aggregateVersion = aggregateVersion;
         this.occurredOn = occurredOn;
@@ -54,6 +60,7 @@ public class EventsJpaEntity {
         return new EventsJpaEntity(
                 aEvent.eventId(),
                 aEvent.eventType(),
+                aEvent.eventClassName(),
                 aEvent.aggregateId(),
                 aEvent.aggregateVersion(),
                 aEvent.occurredOn(),
@@ -61,6 +68,15 @@ public class EventsJpaEntity {
         );
     }
 
+    public <T extends DomainEvent> T toDomainEvent() {
+        try {
+            // noinspection unchecked
+            return Json.readValue(getPayload(), (Class<T>) Class.forName(getEventClassName()));
+        } catch (final ClassNotFoundException e) {
+            throw EventStoreException.with("Error while trying to deserialize event %s".formatted(
+                    e.getMessage()));
+        }
+    }
 
     public String getEventId() {
         return eventId;
@@ -76,6 +92,14 @@ public class EventsJpaEntity {
 
     public void setEventType(String eventType) {
         this.eventType = eventType;
+    }
+
+    public String getEventClassName() {
+        return eventClassName;
+    }
+
+    public void setEventClassName(String eventClassName) {
+        this.eventClassName = eventClassName;
     }
 
     public String getAggregateId() {
@@ -115,6 +139,7 @@ public class EventsJpaEntity {
         return "EventsJpaEntity(" +
                 "eventId='" + eventId + '\'' +
                 ", eventType='" + eventType + '\'' +
+                ", eventClassName='" + eventClassName + '\'' +
                 ", aggregateId='" + aggregateId + '\'' +
                 ", aggregateVersion=" + aggregateVersion +
                 ", occurredOn=" + occurredOn +
