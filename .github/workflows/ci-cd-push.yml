@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.ACTIONS_DEPLOY_KEY }}
 
       - name: Setup Java 17
         uses: actions/setup-java@v3
@@ -41,6 +43,7 @@ jobs:
           default_author: github_actions
           message: 'commit badge'
           add: '*.svg'
+          push: develop
           github_token: ${{ secrets.ACTIONS_DEPLOY_KEY }}
 
       - name: Upload JaCoCo coverage report
