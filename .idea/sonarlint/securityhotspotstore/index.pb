@@ -36,8 +36,6 @@ k
 ;domain/src/main/java/com/kaua/order/domain/order/Order.java,c/4/c4d3af3c5b8af346b09ab52894a423a7a72c2b3b
 o
 ?domain/src/main/java/com/kaua/order/domain/order/OrderItem.java,d/0/d013c4bc219b10099871f1931cee79912fc80966
-k
-;domain/src/main/java/com/kaua/order/domain/ValueObject.java,9/4/94ee4fdd08d7b000d3849a053f43e7dd61f8eb77
 y
 Idomain/src/main/java/com/kaua/order/domain/order/identifiers/OrderId.java,f/6/f6e52732e11ecd922531ac8b3008ca74fcd4ca8d
 q

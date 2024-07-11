@@ -4,6 +4,7 @@ plugins {
     id 'org.springframework.boot' version '3.2.5'
     id 'io.spring.dependency-management' version '1.1.5'
     id 'org.flywaydb.flyway' version '10.13.0'
+    id 'jacoco-report-aggregation'
 }
 
 group = 'com.kaua.order.infrastructure'
@@ -48,7 +49,12 @@ flyway {
 }
 
 testCodeCoverageReport {
-    dependsOn(test)
+    reports {
+        csv.required = true
+        csv.outputLocation = file("$rootDir/build/reports/jacoco/test/jacocoTestReport.csv")
+        html.required = true
+        html.outputLocation = file("$rootDir/build/reports/jacoco/test/jacocoTestReport.html")
+    }
 
     afterEvaluate {
         classDirectories.setFrom(
@@ -73,4 +79,8 @@ jacocoTestCoverageVerification {
                 })
         )
     }
+}
+
+tasks.named("jacocoTestReport") {
+    dependsOn(testCodeCoverageReport)
 }

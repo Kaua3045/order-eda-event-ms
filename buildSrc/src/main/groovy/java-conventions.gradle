@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'jacoco-report-aggregation'
+    id 'jacoco'
 }
 
 version = '0.1.0'
@@ -17,12 +17,6 @@ dependencies {
 
 test {
     useJUnitPlatform()
-}
-
-jacocoTestReport {
-    reports {
-        csv.required = true
-    }
 }
 
 jacocoTestCoverageVerification {
