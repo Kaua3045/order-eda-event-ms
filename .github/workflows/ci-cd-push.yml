@@ -23,11 +23,17 @@ jobs:
       - name: Generate coverage aggregation
         run: ./gradlew jacocoTestReport
 
+      - name: List build directory
+        run: ls -R build/reports/jacoco/test/
+
+      - name: Check jacocoTestReport.csv
+        run: cat build/reports/jacoco/test/jacocoTestReport.csv
+
       - name: Generate jacoco badge
         uses: cicirello/jacoco-badge-generator@v2
         with:
           generate-branches-badge: true
-          # jacoco-csv-file: build/reports/jacoco/test/jacocoTestReport.csv
+          jacoco-csv-file: build/reports/jacoco/test/jacocoTestReport.csv
 
       - name: Log coverage percentage
         run: |
@@ -45,4 +51,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: jacoco-report
-          path: target/site/jacoco/
+          path: build/reports/jacoco/test/
