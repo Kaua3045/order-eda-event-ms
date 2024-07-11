@@ -43,7 +43,7 @@ jobs:
           default_author: github_actions
           message: 'commit badge'
           add: '*.svg'
-          push: develop
+          push: origin main --force
           github_token: ${{ secrets.ACTIONS_DEPLOY_KEY }}
 
       - name: Upload JaCoCo coverage report
