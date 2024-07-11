@@ -28,27 +28,3 @@ jobs:
 
       - name: Run tests and calculate coverage for infrastructure
         run: ./gradlew :infrastructure:jacocoTestReport jacocoTestCoverageVerification
-
-  generate-badge-coverage:
-    needs:
-      - code-analysis
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Java 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Generate coverage aggregation
-        run: ./gradlew jacocoTestReport
-
-      - name: Generate jacoco badge
-        uses: cicirello/jacoco-badge-generator@v2
-        with:
-          generate-branches-badge: true
-          jacoco-csv-file: build/reports/jacoco/test/jacocoTestReport.csv
