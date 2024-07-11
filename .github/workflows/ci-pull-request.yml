@@ -30,6 +30,8 @@ jobs:
         run: ./gradlew :infrastructure:jacocoTestReport jacocoTestCoverageVerification
 
   generate-badge-coverage:
+    needs:
+      - code-analysis
     runs-on: ubuntu-latest
 
     steps:

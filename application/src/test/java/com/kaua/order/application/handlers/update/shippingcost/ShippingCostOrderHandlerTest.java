@@ -60,7 +60,7 @@ public class ShippingCostOrderHandlerTest extends EventHandlerTest {
                 OrderShippingDetails.create(
                         "Correios",
                         "SEDEX",
-                        BigDecimal.TWO
+                        new BigDecimal("2.00")
                 ),
                 aOrderCreation.aggregateVersion(),
                 aOrderCreation.customerId(),
@@ -90,7 +90,7 @@ public class ShippingCostOrderHandlerTest extends EventHandlerTest {
                 OrderShippingDetails.create(
                         "Correios",
                         "SEDEX",
-                        BigDecimal.TWO
+                        new BigDecimal("2.00")
                 ),
                 0,
                 "2",
