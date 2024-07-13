@@ -9,8 +9,8 @@ on:
 
 jobs:
   generate-badge-coverage:
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
 
     steps:
       - name: Checkout code
