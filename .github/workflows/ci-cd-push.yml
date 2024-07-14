@@ -28,7 +28,7 @@ jobs:
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
           COVERALLS_FLAG_NAME: 'DOMAIN'
-        run: ./gradlew coverallsJacoco
+        run: ./gradlew :domain:coverallsJacoco
 
       - name: Generate coverage aggregation
         run: ./gradlew jacocoTestReport
