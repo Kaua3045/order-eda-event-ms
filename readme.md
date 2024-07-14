@@ -1,7 +1,6 @@
 # Ecommerce
 
-[![Coverage](https://github.com/Kaua3045/order-eda-event-ms/blob/develop/.github/badges/jacoco.svg)]()
-[![Branches](https://github.com/Kaua3045/order-eda-event-ms/blob/develop/.github/badges/branches.svg)]()
+[![Coverage Status](https://coveralls.io/repos/github/Kaua3045/order-eda-event-ms/badge.svg)](https://coveralls.io/github/Kaua3045/order-eda-event-ms)
 
 ## Ferramentas utilizadas
 ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=java&logoColor=white)
