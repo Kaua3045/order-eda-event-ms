@@ -19,6 +19,7 @@ kafka:
       id: kafka-listener-orders-external-events-${INSTANCE_ID:1}
       topics:
         - shipping-cost-calculated-external-event-topic
+        - payment-tax-calculated-external-event-topic
       group-id: orders-external-events-group
       max-attempts: 4
       auto-create-topics: false
