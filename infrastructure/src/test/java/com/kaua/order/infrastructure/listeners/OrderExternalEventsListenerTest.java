@@ -1,10 +1,13 @@
 package com.kaua.order.infrastructure.listeners;
 
+import com.kaua.order.application.handlers.update.paymenttax.PaymentTaxOrderHandler;
 import com.kaua.order.application.handlers.update.shippingcost.ShippingCostOrderHandler;
 import com.kaua.order.domain.Fixture;
 import com.kaua.order.domain.events.DomainEvent;
 import com.kaua.order.domain.order.OrderStatus;
+import com.kaua.order.domain.order.events.external.PaymentTaxCalculatedEvent;
 import com.kaua.order.domain.order.events.external.ShippingCostCalculatedEvent;
+import com.kaua.order.domain.order.valueobjects.OrderPaymentDetails;
 import com.kaua.order.domain.order.valueobjects.OrderShippingDetails;
 import com.kaua.order.domain.utils.IdUtils;
 import com.kaua.order.domain.utils.InstantUtils;
@@ -37,6 +40,9 @@ public class OrderExternalEventsListenerTest extends AbstractEmbeddedKafkaTest {
     @MockBean
     private ShippingCostOrderHandler shippingCostOrderHandler;
 
+    @MockBean
+    private PaymentTaxOrderHandler paymentTaxOrderHandler;
+
     @SpyBean
     private KafkaTemplate<String, Object> kafkaTemplate;
 
@@ -45,6 +51,9 @@ public class OrderExternalEventsListenerTest extends AbstractEmbeddedKafkaTest {
 
     @Value("${kafka.consumers.orders-external-events.topics.[0]}")
     private String shippingCostCalculatedTopic;
+
+    @Value("${kafka.consumers.orders-external-events.topics.[1]}")
+    private String paymentTaxCalculatedTopic;
 
     @Captor
     private ArgumentCaptor<ConsumerRecord<String, String>> record;
@@ -176,7 +185,8 @@ public class OrderExternalEventsListenerTest extends AbstractEmbeddedKafkaTest {
         );
         final var aOrderCommandListener = new OrderExternalEventsListener(
                 kafkaTemplate,
-                shippingCostOrderHandler
+                shippingCostOrderHandler,
+                paymentTaxOrderHandler
         );
         aOrderCommandListener.onMessage(aConsumerRecord, aMockedAcknowledgment);
 
@@ -221,7 +231,8 @@ public class OrderExternalEventsListenerTest extends AbstractEmbeddedKafkaTest {
         );
         final var aOrderCommandListener = new OrderExternalEventsListener(
                 kafkaTemplate,
-                shippingCostOrderHandler
+                shippingCostOrderHandler,
+                paymentTaxOrderHandler
         );
         aOrderCommandListener.onDltMessage(aConsumerRecord, aMockAcknowledgment);
 
@@ -266,7 +277,8 @@ public class OrderExternalEventsListenerTest extends AbstractEmbeddedKafkaTest {
         aConsumerRecord.headers().add(HeadersConstants.COMMAND_OCCURRED_ON, aShippingCostCalculatedEvent.occurredOn().toString().getBytes());
         final var aOrderCommandListener = new OrderExternalEventsListener(
                 kafkaTemplate,
-                shippingCostOrderHandler
+                shippingCostOrderHandler,
+                paymentTaxOrderHandler
         );
         aOrderCommandListener.onMessage(aConsumerRecord, aMockAcknowledgment);
 
@@ -274,6 +286,43 @@ public class OrderExternalEventsListenerTest extends AbstractEmbeddedKafkaTest {
         Assertions.assertTrue(aLatch.await(3, TimeUnit.MINUTES));
         Mockito.verify(shippingCostOrderHandler, Mockito.times(0))
                 .handle(Mockito.any());
+    }
+
+    @Test
+    void givenAValidPaymentTaxCalculatedEvent_whenReceive_shouldApplyTax() throws Exception {
+        // given
+        final var aPaymentTaxCalculatedEvent = PaymentTaxCalculatedEvent.from(
+                IdUtils.generateIdWithoutHyphen(),
+                OrderStatus.SHIPPING_CALCULATED.name(),
+                new BigDecimal("10.00"),
+                OrderPaymentDetails.create(
+                        "1",
+                        1,
+                        new BigDecimal("10.00")
+                ),
+                1,
+                "who",
+                "traceId"
+        );
+
+        final var aMessage = Json.writeValueAsString(aPaymentTaxCalculatedEvent);
+
+        final var latch = new CountDownLatch(1);
+
+        Mockito.doAnswer(t -> {
+            latch.countDown();
+            return null;
+        }).when(paymentTaxOrderHandler).handle(Mockito.any());
+
+        // when
+        final var aProducerRecord = createProducerRecord(
+                shippingCostCalculatedTopic,
+                aMessage,
+                aPaymentTaxCalculatedEvent
+        );
+        producer().send(aProducerRecord).get(1, TimeUnit.MINUTES);
+
+        Assertions.assertTrue(latch.await(3, TimeUnit.MINUTES));
     }
 
     record TestListenerEvent(
