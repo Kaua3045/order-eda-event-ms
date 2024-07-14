@@ -201,7 +201,7 @@ public class OrderTest extends UnitTest {
         Assertions.assertTrue(aOrderId.equals(aOrderId));
         Assertions.assertFalse(aOrderId.equals(null));
         Assertions.assertFalse(aOrderId.equals(""));
-//        Assertions.assertEquals(aOrderId.hashCode(), anotherOrderId.hashCode());
+        Assertions.assertEquals(aOrderId.hashCode(), anotherOrderId.hashCode());
     }
 
     @Test
