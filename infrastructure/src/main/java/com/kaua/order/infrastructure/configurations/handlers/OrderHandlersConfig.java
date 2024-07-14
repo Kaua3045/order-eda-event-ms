@@ -4,6 +4,7 @@ import com.kaua.order.application.gateways.CouponGateway;
 import com.kaua.order.application.gateways.CustomerGateway;
 import com.kaua.order.application.gateways.ProductGateway;
 import com.kaua.order.application.handlers.create.AsyncCreateOrderHandler;
+import com.kaua.order.application.handlers.update.paymenttax.PaymentTaxOrderHandler;
 import com.kaua.order.application.handlers.update.shippingcost.ShippingCostOrderHandler;
 import com.kaua.order.application.repositories.EventStore;
 import org.springframework.context.annotation.Bean;
@@ -44,5 +45,10 @@ public class OrderHandlersConfig {
     @Bean
     public ShippingCostOrderHandler shippingCostOrderHandler() {
         return new ShippingCostOrderHandler(eventStore);
+    }
+
+    @Bean
+    public PaymentTaxOrderHandler paymentTaxOrderHandler() {
+        return new PaymentTaxOrderHandler(eventStore);
     }
 }
