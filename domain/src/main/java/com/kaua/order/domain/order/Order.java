@@ -5,7 +5,9 @@ import com.kaua.order.domain.events.DomainEvent;
 import com.kaua.order.domain.exceptions.DomainException;
 import com.kaua.order.domain.exceptions.UnknownEventReceivedException;
 import com.kaua.order.domain.order.events.OrderCreationInitiatedEvent;
+import com.kaua.order.domain.order.events.OrderPaymentTaxCalculatedEvent;
 import com.kaua.order.domain.order.events.OrderShippingCostCalculatedEvent;
+import com.kaua.order.domain.order.events.external.PaymentTaxCalculatedEvent;
 import com.kaua.order.domain.order.events.external.ShippingCostCalculatedEvent;
 import com.kaua.order.domain.order.identifiers.OrderId;
 import com.kaua.order.domain.order.validation.OrderValidation;
@@ -140,6 +142,24 @@ public class Order extends AggregateRoot<OrderId> {
         selfValidate();
     }
 
+    public void handle(final PaymentTaxCalculatedEvent aEvent) {
+        this.setVersion(aEvent.aggregateVersion());
+        this.status = OrderStatus.PAYMENT_TAX_CALCULATED;
+        this.paymentDetails = aEvent.paymentDetails();
+        this.totalAmount = this.totalAmount.add(aEvent.paymentDetails().getTax());
+        incrementVersion();
+        registerEvent(OrderPaymentTaxCalculatedEvent.from(
+                getId().getValue(),
+                getStatus().name(),
+                getTotalAmount(),
+                getPaymentDetails(),
+                getVersion(),
+                aEvent.who(),
+                aEvent.traceId()
+        ));
+        selfValidate();
+    }
+
     public void on(final OrderCreationInitiatedEvent aEvent) {
         this.setVersion(aEvent.aggregateVersion());
         this.status = OrderStatus.of(aEvent.orderStatus()).orElse(null);
@@ -155,8 +175,16 @@ public class Order extends AggregateRoot<OrderId> {
 
     public void on(final OrderShippingCostCalculatedEvent aEvent) {
         this.setVersion(aEvent.aggregateVersion());
-        this.status = OrderStatus.SHIPPING_CALCULATED;
+        this.status = OrderStatus.of(aEvent.orderStatus()).orElse(null);
         this.shippingDetails = aEvent.shippingDetails();
+        this.totalAmount = aEvent.totalAmount();
+        selfValidate();
+    }
+
+    public void on(final OrderPaymentTaxCalculatedEvent aEvent) {
+        this.setVersion(aEvent.aggregateVersion());
+        this.status = OrderStatus.of(aEvent.orderStatus()).orElse(null);
+        this.paymentDetails = aEvent.paymentDetails();
         this.totalAmount = aEvent.totalAmount();
         selfValidate();
     }
@@ -165,6 +193,7 @@ public class Order extends AggregateRoot<OrderId> {
         switch (aEvent.eventType()) {
             case OrderCreationInitiatedEvent.EVENT_TYPE -> on((OrderCreationInitiatedEvent) aEvent);
             case OrderShippingCostCalculatedEvent.EVENT_TYPE -> on((OrderShippingCostCalculatedEvent) aEvent);
+            case OrderPaymentTaxCalculatedEvent.EVENT_TYPE -> on((OrderPaymentTaxCalculatedEvent) aEvent);
             default -> throw new UnknownEventReceivedException(aEvent.eventType());
         }
     }
