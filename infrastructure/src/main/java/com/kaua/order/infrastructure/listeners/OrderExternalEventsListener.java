@@ -1,6 +1,8 @@
 package com.kaua.order.infrastructure.listeners;
 
+import com.kaua.order.application.handlers.update.paymenttax.PaymentTaxOrderHandler;
 import com.kaua.order.application.handlers.update.shippingcost.ShippingCostOrderHandler;
+import com.kaua.order.domain.order.events.external.PaymentTaxCalculatedEvent;
 import com.kaua.order.domain.order.events.external.ShippingCostCalculatedEvent;
 import com.kaua.order.infrastructure.configurations.json.Json;
 import com.kaua.order.infrastructure.constants.HeadersConstants;
@@ -29,13 +31,16 @@ public class OrderExternalEventsListener extends EventListener {
     private static final String ORDER_DLT_INVALID = "order-external-events-dlt-invalid";
 
     private final ShippingCostOrderHandler shippingCostOrderHandler;
+    private final PaymentTaxOrderHandler paymentTaxOrderHandler;
 
     public OrderExternalEventsListener(
             final KafkaTemplate<String, Object> kafkaTemplate,
-            final ShippingCostOrderHandler shippingCostOrderHandler
+            final ShippingCostOrderHandler shippingCostOrderHandler,
+            final PaymentTaxOrderHandler paymentTaxOrderHandler
     ) {
         super(kafkaTemplate);
         this.shippingCostOrderHandler = Objects.requireNonNull(shippingCostOrderHandler);
+        this.paymentTaxOrderHandler = Objects.requireNonNull(paymentTaxOrderHandler);
     }
 
     @KafkaListener(
@@ -43,6 +48,7 @@ public class OrderExternalEventsListener extends EventListener {
             containerFactory = "kafkaListenerFactory",
             topics = {
                     "${kafka.consumers.orders-external-events.topics.[0]}",
+                    "${kafka.consumers.orders-external-events.topics.[1]}",
             },
             groupId = "${kafka.consumers.orders-external-events.group-id}",
             // generate a random id for the consumer
@@ -77,11 +83,23 @@ public class OrderExternalEventsListener extends EventListener {
                     log.debug("Handling ShippingCostCalculatedEvent");
                     final var aEvent = Json.readValue(aPayload, ShippingCostCalculatedEvent.class);
 
-                    log.debug("Deserialized event and handling: {}", aEvent);
+                    log.debug("Deserialized {} event and handling: {}", aEvent.eventType(), aEvent);
                     this.shippingCostOrderHandler.handle(aEvent);
                     ack.acknowledge();
                     // talvez aqui mostrar algo mais atualizado ou melhor
                     log.info("ShippingCostCalculatedEvent processed {}", aEvent);
+                }
+                case PaymentTaxCalculatedEvent.EVENT_TYPE -> {
+                    log.debug("Handling PaymentTaxCalculatedEvent");
+                    final var aEvent = Json.readValue(aPayload, PaymentTaxCalculatedEvent.class);
+
+                    // melhorar esse logs de debug
+                    log.debug("Deserialized {} event and handling: {}", aEvent.eventType(), aEvent);
+                    this.paymentTaxOrderHandler.handle(aEvent);
+                    ack.acknowledge();
+                    // talvez aqui mostrar algo mais atualizado ou melhor
+                    log.info("PaymentTaxCalculatedEvent processed {}", aEvent);
+
                 }
                 default -> handleMessagingTypeNotSupported(
                         record,
