@@ -22,7 +22,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Generate coverage for DOMAIN
-        run: ./gradlew :domain:jacocoTestReport
+        run: ./gradlew :domain:test
 
       - name: Upload coverage DOMAIN to Coveralls
         env:
