@@ -250,4 +250,39 @@ public class EventAPITest {
         Assertions.assertThrows(IllegalStateException.class,
                 anEventRequest::toProducerRecord);
     }
+
+    @Test
+    void givenAValidEventRequestWithPaymentTaxCalculatedEvent_whenCallCreateEvent_thenShouldReturnCreated() throws Exception {
+        final var aPayload = new HashMap<String, Object>();
+        aPayload.put("orderId", IdUtils.generateIdWithoutHyphen());
+        aPayload.put("orderStatus", OrderStatus.CREATION_INITIATED.name());
+        aPayload.put("totalAmount", BigDecimal.TEN);
+        aPayload.put("paymentMethodId", "1");
+        aPayload.put("installments", 1);
+        aPayload.put("paymentTax", BigDecimal.TEN);
+        aPayload.put("aggregateVersion", 1L);
+        aPayload.put("who", "test");
+
+        final var anEventRequest = new EventRequest(
+                "PaymentTaxCalculatedEvent",
+                "payment-tax-calculated",
+                aPayload
+        );
+
+        CompletableFuture<SendResult<String, Object>> successFuture = new CompletableFuture<>();
+        successFuture.complete(Mockito.mock(SendResult.class));
+
+        Mockito.when(kafkaTemplate.send(Mockito.any(ProducerRecord.class))).thenReturn(successFuture);
+
+        final var request = MockMvcRequestBuilders.post("/v1/events")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(anEventRequest));
+
+        this.mvc.perform(request)
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isCreated());
+
+        Mockito.verify(kafkaTemplate, Mockito.times(1)).send(Mockito.any(ProducerRecord.class));
+    }
 }
