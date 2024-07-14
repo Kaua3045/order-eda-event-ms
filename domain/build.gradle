@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'java-conventions'
+    id 'com.github.nbaztec.coveralls-jacoco' version '1.2.20'
 }
 
 group = 'com.kaua.template.domain'
@@ -13,6 +14,16 @@ configurations {
     testClasses {
         extendsFrom(testImplementation)
     }
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+    }
+}
+
+coverallsJacoco {
+    reportPath = file("$projectDir/build/reports/jacoco/test/jacocoTestReport.xml")
 }
 
 tasks.register('testJar', Jar) {
