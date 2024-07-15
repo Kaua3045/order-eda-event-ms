@@ -21,18 +21,18 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # - name: Generate coverage for DOMAIN
-      #   run: ./gradlew :domain:test
+      - name: Generate coverage for DOMAIN
+        run: ./gradlew :domain:test
 
-      # - name: Upload coverage DOMAIN to Codecov
-      #   uses: codecov/codecov-action@v4.5.0
-      #   with:
-      #     directory: domain/build/reports/jacoco/test
-      #     files: ./jacocoTestReport.xml
-      #     flags: domain-module
-      #     name: domain-module
-      #     fail_ci_if_error: true
-      #     token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage DOMAIN to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./domain/build/reports/jacoco/test/jacocoTestReport.xml
+          flags: domain-module
+          name: domain-module
+          verbose: true
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Generate coverage aggregation
         run: ./gradlew jacocoTestReport
