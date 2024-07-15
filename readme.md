@@ -1,5 +1,9 @@
 # Ecommerce
 
+Domain-Module [![codecov-domain-module](https://codecov.io/gh/Kaua3045/order-eda-event-ms/graph/badge.svg?token=97ND0AGZYK&flag=domain-module)](https://codecov.io/gh/Kaua3045/order-eda-event-ms)
+
+Global [![codecov-global](https://codecov.io/gh/Kaua3045/order-eda-event-ms/graph/badge.svg?token=97ND0AGZYK&flag=global)](https://codecov.io/gh/Kaua3045/order-eda-event-ms)
+
 [![Coverage Status](https://coveralls.io/repos/github/Kaua3045/order-eda-event-ms/badge.svg)](https://coveralls.io/github/Kaua3045/order-eda-event-ms)
 
 ## Ferramentas utilizadas
