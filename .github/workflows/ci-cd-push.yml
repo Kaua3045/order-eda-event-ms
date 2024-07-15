@@ -24,6 +24,9 @@ jobs:
       - name: Generate coverage for DOMAIN
         run: ./gradlew :domain:test
 
+      - name: Check if JaCoCo report exists
+        run: ls -l domain/build/reports/jacoco/test/
+
       - name: Upload coverage DOMAIN to Codecov
         uses: codecov/codecov-action@v4.5.0
         with:
