@@ -24,17 +24,37 @@ jobs:
       - name: Generate coverage for DOMAIN
         run: ./gradlew :domain:test
 
-      - name: Upload coverage DOMAIN to Coveralls
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-          COVERALLS_FLAG_NAME: 'DOMAIN'
-        run: ./gradlew :domain:coverallsJacoco
+      - name: Upload coverage DOMAIN to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          files: domain/build/reports/jacoco/test/jacocoTestReport.xml
+          flags: domain-module
+          name: domain-module
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Generate coverage aggregation
         run: ./gradlew jacocoTestReport
 
-      - name: Upload coverage to Coveralls
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-          COVERALLS_FLAG_NAME: 'global'
-        run: ./gradlew coverallsJacoco
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          files: build/reports/jacoco/test/jacocoTestReport.xml
+          flags: global
+          name: global
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+#
+#      - name: Upload coverage DOMAIN to Coveralls
+#        env:
+#          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+#          COVERALLS_FLAG_NAME: 'DOMAIN'
+#        run: ./gradlew :domain:coverallsJacoco
+#
+#      - name: Generate coverage aggregation
+#        run: ./gradlew jacocoTestReport
+#
+#      - name: Upload coverage to Coveralls
+#        env:
+#          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+#          COVERALLS_FLAG_NAME: 'global'
+#        run: ./gradlew coverallsJacoco

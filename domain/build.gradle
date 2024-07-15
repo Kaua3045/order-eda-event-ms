@@ -1,10 +1,9 @@
 plugins {
     id 'java-library'
     id 'java-conventions'
-    id 'com.github.nbaztec.coveralls-jacoco' version '1.2.20'
 }
 
-group = 'com.kaua.template.domain'
+group = 'com.kaua.order.domain'
 
 dependencies {
     implementation 'net.datafaker:datafaker:2.0.1'
@@ -20,10 +19,6 @@ jacocoTestReport {
     reports {
         xml.required = true
     }
-}
-
-coverallsJacoco {
-    reportPath = file("$projectDir/build/reports/jacoco/test/jacocoTestReport.xml")
 }
 
 tasks.register('testJar', Jar) {
