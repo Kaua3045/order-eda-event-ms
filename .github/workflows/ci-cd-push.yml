@@ -40,8 +40,7 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4.5.0
         with:
-          directory: build/reports/jacoco/test
-          files: ./jacocoTestReport.xml
+          files: ./build/reports/jacoco/test/jacocoTestReport.xml
           flags: global
           name: global
           fail_ci_if_error: true
