@@ -25,22 +25,26 @@ jobs:
         run: ./gradlew :domain:test
 
       - name: Upload coverage DOMAIN to Codecov
-        uses: codecov/codecov-action@v4.0.1
+        uses: codecov/codecov-action@v4.5.0
         with:
-          files: domain/build/reports/jacoco/test/jacocoTestReport.xml
+          directory: domain/build/reports/jacoco/test
+          files: ./jacocoTestReport.xml
           flags: domain-module
           name: domain-module
+          fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Generate coverage aggregation
         run: ./gradlew jacocoTestReport
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4.0.1
+        uses: codecov/codecov-action@v4.5.0
         with:
-          files: build/reports/jacoco/test/jacocoTestReport.xml
+          directory: build/reports/jacoco/test
+          files: ./jacocoTestReport.xml
           flags: global
           name: global
+          fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
 
 #
